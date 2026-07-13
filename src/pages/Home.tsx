@@ -22,7 +22,7 @@ export function Home() {
         </h1>
         
         <p className="text-xl text-white/90 mb-2 font-medium">
-          Can you uncover all four hidden Manager Recognition Badges?
+          Can you uncover all four hidden badges?
         </p>
         <p className="text-white/60 mb-10">
           Guess the badge names one letter at a time.
