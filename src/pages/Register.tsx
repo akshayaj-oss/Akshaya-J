@@ -21,8 +21,8 @@ export function Register() {
 
     const normalizedEmpId = employeeId.trim().toUpperCase();
     
-    if (!/^GGN\/?\d+$/.test(normalizedEmpId)) {
-      setError('Employee ID must start with "GGN" followed by numbers (e.g., GGN/1234).');
+    if (!/^(GGN|NW)\/?\d+$/.test(normalizedEmpId)) {
+      setError('Employee ID must start with "GGN" or "NW" followed by numbers (e.g., GGN/1234 or NW/1234).');
       return;
     }
 
@@ -106,7 +106,7 @@ export function Register() {
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-white/20 bg-black/20 text-white focus:border-brand-gold focus:ring-0 outline-none transition-colors text-lg placeholder-white/30"
-              placeholder="e.g. GGN/1234"
+              placeholder="e.g. GGN/1234 or NW/1234"
               required
             />
           </div>

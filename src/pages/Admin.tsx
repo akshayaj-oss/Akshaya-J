@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Participant } from '../types';
 import { formatTime } from '../lib/utils';
-import { Download, Search, Home, Lock, Users, Trophy } from 'lucide-react';
+import { Download, Search, Home, Lock, Users, Trophy, Trash2 } from 'lucide-react';
 
 export function Admin() {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ export function Admin() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -73,6 +74,28 @@ export function Admin() {
     document.body.removeChild(link);
   };
 
+  const handleReset = async () => {
+    if (!window.confirm('Are you sure you want to completely reset the leaderboard? This action cannot be undone.')) {
+      return;
+    }
+    
+    setIsResetting(true);
+    try {
+      // Get all documents in the collection and delete them
+      const snapshot = await getDocs(collection(db, 'participants'));
+      const deletePromises = snapshot.docs.map(document => 
+        deleteDoc(doc(db, 'participants', document.id))
+      );
+      await Promise.all(deletePromises);
+      alert('Leaderboard has been successfully reset.');
+    } catch (error) {
+      console.error('Error resetting leaderboard:', error);
+      alert('Failed to reset leaderboard. Check console for details.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex-1 flex items-center justify-center p-4">
@@ -116,6 +139,14 @@ export function Admin() {
             <p className="text-white/60 text-sm">Badge Reveal Challenge</p>
           </div>
           <div className="flex gap-4">
+            <button
+              onClick={handleReset}
+              disabled={isResetting}
+              className="flex items-center gap-2 bg-red-600/80 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs tracking-widest font-bold uppercase transition-colors disabled:opacity-50"
+            >
+              <Trash2 size={16} />
+              {isResetting ? 'Resetting...' : 'Reset'}
+            </button>
             <button
               onClick={exportCSV}
               className="flex items-center gap-2 bg-[#4CAF50] hover:bg-[#45a049] text-white px-4 py-2 rounded-lg text-xs tracking-widest font-bold uppercase transition-colors"
